@@ -1,0 +1,86 @@
+#include <iostream>
+#include<cstring>
+#include <algorithm>
+using namespace std;
+char infix[10],prefix[10],postfix[10];
+char stack[10];
+int top=-1;
+void push(char ch){
+    stack[++top]=ch;
+}
+char pop(){
+    return stack[top--];
+}
+int precedence(char op){
+    if(op=='+'||op=='-')
+        return 1;
+    if(op=='*'||op =='/')
+    return 2;
+    return 0;
+}
+void infix_to_postfix(){
+    int i=0,j=0;
+    while(infix[i]!='\0'){
+        if (infix[i]>='a'&& infix[i]<='z'){
+            postfix[j++]=infix[i++];
+        }else if(infix[i]=='('){
+            push(infix[i++]);
+        }else if(infix[i] ==')'){
+            while(stack[top]!='('){
+                postfix[j++] = pop();
+            }
+            pop();
+            i++;
+        }else{
+            while(top!=-1 && precedence(stack[top])>=precedence(infix[i])){
+                postfix[j++]=pop();
+            }
+            push(infix[i++]);
+        }
+    }
+    while(top!=-1){
+        postfix[j++]=pop();
+    }
+    postfix[j]='\0';
+    cout<<"postfix:"<<postfix<<endl;
+}
+void infix_to_prefix(){
+    int length=strlen(infix);
+    reverse(infix,infix+length);
+    for(int i=0;i<length;i++){
+        if(infix[i] == '(')infix[i]=')';
+        else if(infix[i]==')')infix[i]='(';
+    }
+    int i=0,j=0;
+    while(infix[i]!= '\0'){
+        if (infix[i]>='a' && infix[i]<='z'){
+            prefix[j++]=infix[i++];
+        }else if(infix[i]=='('){
+            push(infix[i++]);
+        }else if(infix[i]==')'){
+            while(stack[top]!='('){
+                prefix[j++]=pop();
+            }
+            pop();
+            i++;
+        }else{
+            while(top!=-1 && precedence(stack[top])>precedence(infix[i])){
+                prefix[j++]=pop();
+            }
+            push(infix[i++]);
+        }
+    }
+    while(top!=-1){
+        prefix[j++]=pop();
+    }
+    prefix[j]='\0';
+    reverse(prefix,prefix+j);
+    cout<<"prefix:"<<prefix<<endl;
+}
+int main(){
+    cout<<"input infix expression:";
+    cin >> infix;
+    infix_to_prefix();
+    infix_to_postfix();
+    return 0;
+}
